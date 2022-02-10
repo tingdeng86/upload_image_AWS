@@ -10,6 +10,7 @@ const PageHome = () => {
     const navigate = useNavigate();
     const [images, setImages] = useState([])
     const [file, setFile] = useState("")
+    const [description, setDescription] = useState("")
     // const [user, setUser] = useState(null)
     const [title, setTitle] = useState("")
     const dispatch = useDispatch()
@@ -37,10 +38,10 @@ const PageHome = () => {
                         Authorization: token
                     }
                 })
-            const images = imagesResult.data.images
+            const images = imagesResult.data
+            console.log(images)
             setImages(images)
         }
-
         getSunnyDay()
 
     }, [])
@@ -56,14 +57,28 @@ const PageHome = () => {
             })
         const url = urlRestult.data.url
         await axios.put(url, file, { headers: { "Content-Type": file.type } })
+        console.log(url)
         const imageUrl = url.split("?")[0]
-        setImages([imageUrl, ...images])
+        const imageNames = imageUrl.split('\/')
+        const imageName = imageNames[imageNames.length - 1]
+        const result = await axios.post("https://7qmr8tyali.execute-api.ca-central-1.amazonaws.com/dev/images",{
+            imageName,
+            description},
+            {
+                headers: {
+                    Authorization: token
+                }
+            }
+       )
+       console.log(result)
+        setImages([result.data, ...images])
         setFile("")
     }
 
     const deleteImage = async imageUrl => {
-        const imageNames = imageUrl.split('\/')
-        const imageName = imageNames[imageNames.length - 1]
+        console.log(imageUrl)
+        // const imageNames = imageUrl.split('\/')
+        const imageName = imageUrl.image_name
         const token = await userToken()
         console.log(imageName)
         const deleteUrl = ` https://7qmr8tyali.execute-api.ca-central-1.amazonaws.com/dev/images/${imageName}`
@@ -89,13 +104,15 @@ const PageHome = () => {
                 <h1>{title}</h1>
                 <form onSubmit={submitImage} className="form-group selected-image">
                     <input className="custom-file-input" onChange={e => setFile(e.target.files[0])} type="file" accept="image/*" ></input>
+                    <input className='description' type="text"  placeholder='description' onChange={e => setDescription(e.target.value)}/>
                     <button type="submit" className="btn btn-outline-dark" disabled={!file}>Submit</button>
                 </form>
                 {
                     images.map(image => (
-                        <div key={image} className="image-container" >
-                            <img src={image} alt="" />
+                        <div key={image.id} className="image-container" >
+                            <img src={"https://week-4-aws.s3.ca-central-1.amazonaws.com/"+image.image_name} alt="" />
                             <button type="submit" className="btn btn-secondary" onClick={() => deleteImage(image)}>Delete</button>
+                            <h2>{image.description}</h2>
                         </div>
                     ))
                 }

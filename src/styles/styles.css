@@ -243,14 +243,21 @@ nav.main-nav ul li a:after {
 nav.main-nav ul li a:hover:after {
   width: 100%;
 }
+.description{
+  margin-right: 10px;
+}
 .selected-image{
   margin: 0 auto;
-  max-width:500px;
+  max-width:600px;
 }
 .image-container{ 
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
   margin-top: 20px;
+}
+.selected-image h2{
+  text-align: center;
+  margin: 0 auto;
 }
 /* h1{
   text-align: center;
